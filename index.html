@@ -1,9 +1,13 @@
+<?php
+  include('/Users/valerieeberhard/database_config.php')
+?>
+
 <!DOCTYPE html><html class=''>
 <head>
     <meta charset='UTF-8'>
     <meta name="robots" content="noindex">
     <title>The Experiment Factory flanker</title>
-    
+
 <link rel='stylesheet' type='text/css' href='jspsych.css'>
 <link rel='stylesheet' type='text/css' href='default_style.css'>
 <link rel='stylesheet' type='text/css' href='style.css'>
@@ -26,6 +30,7 @@
 <script src='experiment.js'></script>
 
 <script>
+
 $( document ).ready(function() {
 
     jsPsych.init({
@@ -38,6 +43,8 @@ $( document ).ready(function() {
 
              on_finish: function(data){
 
+
+
                  // Serialize the data
                  var promise = new Promise(function(resolve, reject) {
                      var data = jsPsych.data.dataAsJSON();
@@ -46,25 +53,45 @@ $( document ).ready(function() {
 
                  promise.then(function(data) {
 
+                    // insert start
 
-                     $.ajax({
-                         type: "POST",
-                         url: '/save',
-                         data: { "data": data },
-                         success: function(){ document.location = "/next" },
-                         dataType: "application/json",
+                    var xhr = new XMLHttpRequest();
+                    xhr.open('POST', 'write_data.php'); // change 'write_data.php' to point to php script.
+                    xhr.setRequestHeader('Content-Type', 'application/json');
+                    xhr.onload = function() {
+                      if(xhr.status == 200){
+                        var response = JSON.parse(xhr.responseText);
+                        console.log(response.success);
+                      }
+                    };
+
+                    xhr.send(jsPsych.data.get().json());
+
+                    // insert end
+
+                    // deleted start
+
+                    // $.ajax({
+                    //     type: "POST",
+                    //     url: '/save',
+                    //     data: { "data": data },
+                    //     success: function(){ document.location = "/next" },
+                    //     dataType: "application/json",
+
+                    // deleted end
 
                          // Endpoint not running, local save
-                         error: function(err) {
+                    //     error: function(err) {
 
-                             if (err.status == 200){
-                                 document.location = "/next";
-                             } else {
-                                 // If error, assue local save
-                                 jsPsych.data.localSave('flanker_results.csv', 'csv');
-                             }
-                         }
-                     });
+                    //         if (err.status == 200){
+                    //             document.location = "/Users/valerieeberhard";
+                    //         } else {
+                    //             // If error, assue local save
+                    //             jsPsych.data.localSave('flanker_results.csv', 'csv');
+                    //         }
+                    //     }
+                    // deleted end
+
                  })
              }
 
